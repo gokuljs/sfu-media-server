@@ -38,6 +38,11 @@ function App() {
           console.log(`Added ${track.kind} track to peer connection`);
         });
 
+        if(!socket.connected){
+          console.log("not connected to server")
+          return;
+        }
+
         if (pc.signalingState !== "stable") {
           console.warn(
             "cannot create state.Signaling state:",
