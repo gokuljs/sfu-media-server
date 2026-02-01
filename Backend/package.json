@@ -16,5 +16,8 @@
     "real-time"
   ],
   "author": "Your Name <your.email@example.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "socket.io": "^4.8.3"
+  }
 }

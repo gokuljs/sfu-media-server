@@ -1,0 +1,13 @@
+{
+  "name": "sfu-media-server-monorepo",
+  "version": "1.0.0",
+  "description": "SFU media server with frontend and backend",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}
