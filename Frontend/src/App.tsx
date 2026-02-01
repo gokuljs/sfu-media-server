@@ -38,7 +38,18 @@ function App() {
           console.log(`Added ${track.kind} track to peer connection`);
         });
 
-        console.log("Media initialized successfully");
+        if (pc.signalingState !== "stable") {
+          console.warn(
+            "cannot create state.Signaling state:",
+            pc.signalingState
+          );
+          return;
+        }
+        const offer= await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        console.log("offer sdp to server")
+        console.log({offer})
+        socket.emit("offer", {offer});
       } catch (error) {
         console.error("Failed to initialize media:", error);
       }
