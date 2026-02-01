@@ -1,38 +1,48 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const { RTCPeerConnection } = require('@roamhq/wrtc');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', 
+    origin: '*',
     methods: ['GET', 'POST'],
   },
 });
 
 const PORT = process.env.PORT || 3000;
-
-// Middleware
+const clients = {};
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check route
-app.get('/', (req, res) => {
-  res.json({ message: 'SFU Media Server is running' });
+const handlePeerConnection = async (socketId, offer) => {
+  const pc = new RTCPeerConnection();
+  await pc.setRemoteDescription(offer);
+  return pc;
+};
+
+io.on('connection', socket => {
+  console.log('new client connected', socket.id);
+  clients[socket.id] = {
+    socket,
+    peerConnections: null,
+    isRenegotiating: false,
+    localStream: null,
+  };
+  socket.on('offer', async data => {
+    try {
+      const  peerConnection = await handlePeerConnection(socket.id, data.offer);
+      clients[socket.id].peerConnections = peerConnection;
+    } catch (error) {
+      console.error('Error handling peer connection', error);
+    }
+  });
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-io.on('connection',(socket)=>{
-  console.log("client connected")
-  socket.on('disconnect',()=>{
-    console.log("Client disconnected")
-  }) 
-})
-
 
 // Start server
 server.listen(PORT, () => {
