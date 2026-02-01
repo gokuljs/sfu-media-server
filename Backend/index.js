@@ -12,22 +12,18 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-
-// Middleware
+const clients ={}
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check route
-app.get('/', (req, res) => {
-  res.json({ message: 'SFU Media Server is running' });
-});
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
 io.on('connection',(socket)=>{
-  console.log("client connected")
+  console.log("new client connected", socket.id)
+  clients[socket.id] = {
+    socket,
+    peerConnections: null,
+    isRenegotiating: false,
+    localStream: null,
+  }
   socket.on('disconnect',()=>{
     console.log("Client disconnected")
   }) 
