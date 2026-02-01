@@ -26,6 +26,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+io.on('connection',(socket)=>{
+  console.log("client connected")
+  socket.on('disconnect',()=>{
+    console.log("Client disconnected")
+  }) 
+})
+
 
 // Start server
 server.listen(PORT, () => {
